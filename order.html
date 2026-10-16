@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitoob — Buyurtma va Navbatni Rasmiylashtirish</title>
+    <meta name="description" content="Kitob do'konimizdan kitob xarid qilish yoki navbat/bron qilish sahifasi. Buyurtmangiz to'g'ridan-to'g'ri Telegram botimizga yuboriladi.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4338ca;
+            --primary-hover: #3730a3;
+            --primary-light: #e0e7ff;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --dark: #0f172a;
+            --dark-muted: #334155;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 20px 35px -10px rgba(15, 23, 42, 0.12);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --dark: #f8fafc;
+            --dark-muted: #cbd5e1;
+            --text-muted: #94a3b8;
+            --bg-body: #0b0f19;
+            --bg-card: #131b2e;
+            --border-color: #1e293b;
+            --primary-light: rgba(67, 56, 202, 0.2);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-body);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+        .container { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        .header {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+        .brand-logo { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .brand-icon {
+            width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: #fff; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+        }
+        .nav-menu { display: flex; align-items: center; gap: 32px; }
+        .nav-link { font-size: 0.95rem; font-weight: 600; color: var(--dark-muted); padding: 6px 0; position: relative; }
+        .nav-link:hover, .nav-link.active { color: var(--primary); }
+        .nav-link.active::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2.5px;
+            background: var(--primary); border-radius: var(--radius-full);
+        }
+
+        /* Banner */
+        .page-banner {
+            padding: 50px 0 30px;
+            background: linear-gradient(180deg, var(--primary-light) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+        .page-banner h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 10px; }
+        .page-banner p { color: var(--text-muted); font-size: 1.05rem; }
+
+        /* Order Layout Grid */
+        .order-layout {
+            display: grid;
+            grid-template-columns: 1.3fr 0.9fr;
+            gap: 40px;
+            margin-bottom: 80px;
+            align-items: flex-start;
+        }
+
+        .card-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-box h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--dark);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Delivery Options Selector */
+        .radio-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .radio-card {
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .radio-card.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .radio-card input {
+            display: none;
+        }
+
+        /* Cart Summary In Order Page */
+        .cart-summary-list {
+            margin-bottom: 24px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-info h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-info p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .summary-item-total {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .qty-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .price-breakdown {
+            border-top: 2px dashed var(--border-color);
+            padding-top: 18px;
+            margin-bottom: 24px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.92rem;
+            margin-bottom: 10px;
+            color: var(--dark-muted);
+        }
+
+        .breakdown-row.total-bold {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-submit-order {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: #fff;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(67, 56, 202, 0.3);
+            transition: var(--transition);
+        }
+
+        .btn-submit-order:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(67, 56, 202, 0.4);
+        }
+
+        .btn-submit-order:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Success Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .success-box {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            background: #dcfce7;
+            color: #16a34a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin: 0 auto 20px;
+        }
+
+        /* Spinner for loading state */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 900px) {
+            .order-layout { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon">📚</div>
+                <span>Kitoob.</span>
+            </a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Bosh sahifa</a>
+                <a href="catalog.html" class="nav-link">Kitoblar katalogi</a>
+                <a href="order.html" class="nav-link active">Buyurtma va Navbat</a>
+            </nav>
+            <div class="header-actions">
+                <a href="catalog.html" class="btn" style="border: 1px solid var(--border-color);">Katalogga qaytish</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <h1>Buyurtma va Navbatni Rasmiylashtirish</h1>
+            <p>Ma'lumotlaringizni to'ldiring — buyurtmangiz Telegram orqali do'kon ma'muriyatiga bir zumda yetib boradi.</p>
+        </div>
+    </section>
+
+    <!-- Main Order Form -->
+    <main class="container">
+        <div class="order-layout">
+            <!-- Left Column: Customer Form -->
+            <div class="card-box">
+                <h2>📝 Mijoz Ma'lumotlari</h2>
+                <form id="orderForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">To'liq ismingiz (F.I.Sh) *</label>
+                            <input type="text" class="form-control" id="custName" required placeholder="Masalan: Alisher Usmonov">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefon raqamingiz *</label>
+                            <input type="tel" class="form-control" id="custPhone" required placeholder="+998 (90) 123-45-67">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Xizmat turi *</label>
+                        <div class="radio-options">
+                            <label class="radio-card active" id="optDelivery">
+                                <input type="radio" name="orderType" value="delivery" checked>
+                                <div>
+                                    <strong>🚚 Yetkazib berish</strong>
+                                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Kuryer orqali eshikkacha</p>
+                                </div>
+                            </label>
+                            <label class="radio-card" id="optPickup">
+                                <input type="radio" name="orderType" value="pickup">
+                                <div>
+                                    <strong>🏬 Bron / Olib ketish</strong>
+                                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Do'kondan navbatsiz olish</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="addressGroup">
+                        <label class="form-label">Yetkazib berish manzili *</label>
+                        <input type="text" class="form-control" id="custAddress" placeholder="Shahar, tuman, ko'cha, uy raqami...">
+                    </div>
+
+                    <div class="form-group" id="branchGroup" style="display: none;">
+                        <label class="form-label">Qaysi filialimizdan olib ketasiz? *</label>
+                        <select class="form-control" id="custBranch">
+                            <option value="Bosh filial (Navoiy ko'chasi 24)">Bosh filial (Navoiy ko'chasi 24)</option>
+                            <option value="Chilonzor filiali (Chilonzor metro yaqinida)">Chilonzor filiali (Chilonzor metro yaqinida)</option>
+                            <option value="Yunusobod filiali (Mega Planet ro'parasida)">Yunusobod filiali (Mega Planet ro'parasida)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">To'lov usuli *</label>
+                            <select class="form-control" id="custPayment">
+                                <option value="Naqd pul orqali (Qabul qilganda)">Naqd pul (Qabul qilinganda)</option>
+                                <option value="Payme / Click online">Payme / Click (Online)</option>
+                                <option value="Terminal orqali (Karta)">Terminal (Humo / UzCard)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Qulay yetkazish/qabul vaqti</label>
+                            <input type="text" class="form-control" id="custTime" placeholder="Masalan: Bugun 18:00 dan keyin">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Qo'shimcha izoh yoki kitobga tilak</label>
+                        <textarea class="form-control" id="custNotes" rows="3" placeholder="Qo'shimcha eslatmalar, sovg'a o'rami yoki istaklaringiz..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit-order" id="submitBtn">
+                        <span id="btnText">Buyurtmani tasdiqlash va Telegramga yuborish</span>
+                        <div class="spinner" id="btnSpinner" style="display: none;"></div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Cart Summary -->
+            <div class="card-box">
+                <h2>🛒 Savat Tarkibi</h2>
+                <div class="cart-summary-list" id="cartSummaryList">
+                    <!-- Dynamic Cart Items -->
+                </div>
+
+                <div class="price-breakdown">
+                    <div class="breakdown-row">
+                        <span>Kitoblar narxi:</span>
+                        <span id="subtotalPrice">0 so'm</span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span>Yetkazib berish xizmati:</span>
+                        <span id="shippingPrice">15,000 so'm</span>
+                    </div>
+                    <div class="breakdown-row total-bold">
+                        <span>Jami to'lov:</span>
+                        <span id="finalTotalPrice" style="color: var(--primary);">0 so'm</span>
+                    </div>
+                </div>
+
+                <div style="background: var(--primary-light); padding: 16px; border-radius: var(--radius-md); font-size: 0.85rem; color: var(--primary);">
+                    ℹ️ <strong>Telegram xabarnoma:</strong> Formani to'ldirib yuborganingizdan so'ng, buyurtma ma'lumotlari to'g'ridan-to'g'ri administrator botiga (@stoomuzbot) yetkaziladi va siz bilan tezda bog'lanishadi.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="success-box">
+            <div class="success-icon">✓</div>
+            <h2 style="font-size: 1.6rem; margin-bottom: 12px;">Buyurtmangiz qabul qilindi!</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px;">
+                Rahmat! Barcha ma'lumotlar muvaffaqiyatli Telegram orqali administratorimizga yuborildi. Tez orada siz bilan telefon orqali bog'lanamiz.
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <a href="index.html" class="btn btn-primary">Bosh sahifaga qaytish</a>
+                <a href="catalog.html" class="btn" style="border: 1px solid var(--border-color);">Yana kitob ko'rish</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT & TELEGRAM API INTEGRATION -->
+    <script>
+        // CONFIGURATION: Telegram Bot Credentials
+        const TELEGRAM_CONFIG = {
+            botToken: "8688040967:AAFsx4FftOmIKAO09c3JGBwyI7nU7KM2V0Y",
+            chatId: "5748587254"
+        };
+
+        const CART_KEY = 'kitoob_cart';
+
+        function getCart() {
+            try {
+                const stored = localStorage.getItem(CART_KEY);
+                return stored ? JSON.parse(stored) : [];
+            } catch(e) { return []; }
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem(CART_KEY, JSON.stringify(cart));
+            renderSummary();
+        }
+
+        function changeQuantity(id, delta) {
+            let cart = getCart();
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity = (item.quantity || 1) + delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+                saveCart(cart);
+            }
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('cartSummaryList');
+            const cart = getCart();
+            const orderType = document.querySelector('input[name="orderType"]:checked')?.value || 'delivery';
+            const shippingCost = orderType === 'delivery' ? 15000 : 0;
+
+            if (cart.length === 0) {
+                // If cart is completely empty, provide quick starter book
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 24px 0; color: var(--text-muted);">
+                        <p>Savatingiz hozircha bo'sh.</p>
+                        <a href="catalog.html" style="color: var(--primary); font-weight:700; display:inline-block; margin-top:8px;">
+                            + Katalogdan kitob tanlash
+                        </a>
+                    </div>
+                `;
+                document.getElementById('subtotalPrice').textContent = '0 so\'m';
+                document.getElementById('shippingPrice').textContent = '0 so\'m';
+                document.getElementById('finalTotalPrice').textContent = '0 so\'m';
+                return;
+            }
+
+            let subtotal = 0;
+            container.innerHTML = cart.map(item => {
+                const itemTotal = item.price * (item.quantity || 1);
+                subtotal += itemTotal;
+                return `
+                    <div class="summary-item">
+                        <div class="summary-info">
+                            <h4>${item.title}</h4>
+                            <p>${item.price.toLocaleString()} so'm</p>
+                            <div class="qty-controls">
+                                <button type="button" class="qty-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
+                                <span style="font-size:0.88rem; font-weight:700;">${item.quantity || 1} dona</span>
+                                <button type="button" class="qty-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="summary-item-total">${itemTotal.toLocaleString()} so'm</div>
+                    </div>
+                `;
+            }).join('');
+
+            const grandTotal = subtotal + shippingCost;
+            document.getElementById('subtotalPrice').textContent = subtotal.toLocaleString() + " so'm";
+            document.getElementById('shippingPrice').textContent = shippingCost > 0 ? shippingCost.toLocaleString() + " so'm" : "Bepul";
+            document.getElementById('finalTotalPrice').textContent = grandTotal.toLocaleString() + " so'm";
+        }
+
+        // Toggle Delivery vs Pickup
+        const optDelivery = document.getElementById('optDelivery');
+        const optPickup = document.getElementById('optPickup');
+        const addressGroup = document.getElementById('addressGroup');
+        const branchGroup = document.getElementById('branchGroup');
+
+        optDelivery.addEventListener('click', () => {
+            optDelivery.classList.add('active');
+            optPickup.classList.remove('active');
+            optDelivery.querySelector('input').checked = true;
+            addressGroup.style.display = 'block';
+            branchGroup.style.display = 'none';
+            renderSummary();
+        });
+
+        optPickup.addEventListener('click', () => {
+            optPickup.classList.add('active');
+            optDelivery.classList.remove('active');
+            optPickup.querySelector('input').checked = true;
+            addressGroup.style.display = 'none';
+            branchGroup.style.display = 'block';
+            renderSummary();
+        });
+
+        // Initialize default sample book if cart is empty on first visit
+        document.addEventListener('DOMContentLoaded', () => {
+            const cart = getCart();
+            if (cart.length === 0) {
+                // Add default bestseller so user can test form right away
+                cart.push({ id: 1, title: "Atom Odatlar", price: 49000, quantity: 1 });
+                localStorage.setItem(CART_KEY, JSON.stringify(cart));
+            }
+            renderSummary();
+        });
+
+        // Form Submit Handler -> Sends to Telegram Bot API
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const orderType = document.querySelector('input[name="orderType"]:checked').value;
+            const address = orderType === 'delivery' ? (document.getElementById('custAddress').value.trim() || 'Kiritilmagan') : 'Filialdan olib ketiladi';
+            const branch = orderType === 'pickup' ? document.getElementById('custBranch').value : 'Yetkazib berish tanlangan';
+            const payment = document.getElementById('custPayment').value;
+            const time = document.getElementById('custTime').value.trim() || 'Ixtiyoriy vaqt';
+            const notes = document.getElementById('custNotes').value.trim() || 'Yo\'q';
+
+            const cart = getCart();
+            if (cart.length === 0) {
+                alert("Savatingizda kitob yo'q. Iltimos avval kitob tanlang!");
+                return;
+            }
+
+            // Calculate Totals
+            let subtotal = 0;
+            let booksListText = "";
+            cart.forEach((item, index) => {
+                const totalItem = item.price * (item.quantity || 1);
+                subtotal += totalItem;
+                booksListText += `  ${index + 1}. <b>${item.title}</b> — ${item.quantity} dona (${totalItem.toLocaleString()} so'm)\n`;
+            });
+
+            const shippingCost = orderType === 'delivery' ? 15000 : 0;
+            const grandTotal = subtotal + shippingCost;
+            const orderTypeStr = orderType === 'delivery' ? '🚚 Kuryer orqali yetkazish' : '🏬 Do\'kondan olib ketish / Bron';
+            const destinationStr = orderType === 'delivery' ? `📍 <b>Manzil:</b> ${address}` : `🏬 <b>Filial:</b> ${branch}`;
+
+            const currentDate = new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' });
+
+            // Compose HTML Message for Telegram
+            const telegramMessage = `
+📚 <b>YANGI BUYURTMA / BRON (Kitoob)</b>
+━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 <b>Mijoz:</b> ${name}
+📞 <b>Telefon:</b> ${phone}
+📦 <b>Xizmat turi:</b> ${orderTypeStr}
+${destinationStr}
+💳 <b>To'lov usuli:</b> ${payment}
+⏰ <b>Istalgan vaqt:</b> ${time}
+💬 <b>Qo'shimcha izoh:</b> ${notes}
+
+📖 <b>Buyurtma qilingan kitoblar:</b>
+${booksListText}
+💵 <b>Kitoblar summasi:</b> ${subtotal.toLocaleString()} so'm
+🚚 <b>Yetkazish:</b> ${shippingCost > 0 ? shippingCost.toLocaleString() + " so'm" : "Bepul"}
+💰 <b>JAMI TO'LOV:</b> ${grandTotal.toLocaleString()} so'm
+━━━━━━━━━━━━━━━━━━━━━━━━━
+🕒 <b>Sana va vaqt:</b> ${currentDate}
+            `.trim();
+
+            // UI Loading State
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            submitBtn.disabled = true;
+            btnText.textContent = "Yuborilmoqda...";
+            btnSpinner.style.display = "block";
+
+            try {
+                const url = `https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendMessage`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CONFIG.chatId,
+                        text: telegramMessage,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.ok) {
+                    // Success! Clear cart and show modal
+                    localStorage.removeItem(CART_KEY);
+                    document.getElementById('successModal').classList.add('active');
+                } else {
+                    alert("Telegram botga yuborishda xatolik yuz berdi: " + (result.description || "Noma'lum xatolik"));
+                }
+            } catch (error) {
+                console.error("Xatolik:", error);
+                alert("Internet aloqasini tekshiring yoki qayta urinib ko'ring.");
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = "Buyurtmani tasdiqlash va Telegramga yuborish";
+                btnSpinner.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

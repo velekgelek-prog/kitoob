@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitoob — Kitoblar Katalogi | Keng Tanlov</title>
+    <meta name="description" content="Kitoob do'konining barcha kitoblar katalogi. Badiiy, ilmiy, psixologiya va biznes kitoblarini saralang va xarid qiling.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. DESIGN SYSTEM & CSS VARIABLES
+           ========================================================================== */
+        :root {
+            --primary: #4338ca;
+            --primary-hover: #3730a3;
+            --primary-light: #e0e7ff;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --dark: #0f172a;
+            --dark-muted: #334155;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 20px 35px -10px rgba(15, 23, 42, 0.12);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --dark: #f8fafc;
+            --dark-muted: #cbd5e1;
+            --text-muted: #94a3b8;
+            --bg-body: #0b0f19;
+            --bg-card: #131b2e;
+            --border-color: #1e293b;
+            --primary-light: rgba(67, 56, 202, 0.2);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-body);
+            color: var(--dark);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+        .container { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+        /* ==========================================================================
+           2. HEADER
+           ========================================================================== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        [data-theme="dark"] .header { background: rgba(19, 27, 46, 0.85); }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+        .brand-logo { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .brand-icon {
+            width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: #fff; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+        }
+        .nav-menu { display: flex; align-items: center; gap: 32px; }
+        .nav-link { font-size: 0.95rem; font-weight: 600; color: var(--dark-muted); padding: 6px 0; position: relative; }
+        .nav-link:hover, .nav-link.active { color: var(--primary); }
+        .nav-link.active::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2.5px;
+            background: var(--primary); border-radius: var(--radius-full);
+        }
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .icon-btn {
+            width: 44px; height: 44px; border-radius: var(--radius-md); border: 1px solid var(--border-color);
+            background: var(--bg-card); color: var(--dark); display: flex; align-items: center; justify-content: center;
+            position: relative; transition: var(--transition);
+        }
+        .icon-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .badge-count {
+            position: absolute; top: -5px; right: -5px; background: var(--accent); color: #000;
+            font-size: 0.72rem; font-weight: 800; width: 20px; height: 20px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-card);
+        }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; font-weight: 600; padding: 12px 24px; border-radius: var(--radius-md); transition: var(--transition); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #6366f1); color: #fff; box-shadow: 0 4px 15px rgba(67, 56, 202, 0.25); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(67, 56, 202, 0.35); }
+
+        /* ==========================================================================
+           3. CATALOG PAGE HEADER & CONTROLS
+           ========================================================================== */
+        .page-banner {
+            padding: 50px 0 30px;
+            background: linear-gradient(180deg, var(--primary-light) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+        .page-banner h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 10px; }
+        .page-banner p { color: var(--text-muted); font-size: 1.05rem; }
+
+        /* Filter & Search Bar */
+        .catalog-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 420px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 18px 12px 46px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--dark);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            font-size: 0.88rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--dark-muted);
+            transition: var(--transition);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .sort-select {
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--dark);
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        /* ==========================================================================
+           4. BOOKS GRID & CARDS
+           ========================================================================== */
+        .catalog-layout {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 26px;
+            margin-bottom: 70px;
+        }
+
+        .catalog-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .catalog-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-cover {
+            height: 220px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .mockup-book {
+            width: 125px;
+            height: 180px;
+            border-radius: 6px;
+            padding: 14px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            transition: var(--transition);
+        }
+
+        .catalog-card:hover .mockup-book {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .cat-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+        }
+
+        .card-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+
+        .card-author {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .card-price-row {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        .price-text {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .btn-circle:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* ==========================================================================
+           5. BOOK DETAILS MODAL
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 680px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            animation: modalFadeIn 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes modalFadeIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-body);
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        .modal-cover-wrap {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .modal-content {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content h2 { font-size: 1.6rem; margin-bottom: 6px; }
+        .modal-author { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px; }
+        .modal-desc { font-size: 0.9rem; color: var(--dark-muted); line-height: 1.6; margin-bottom: 24px; }
+        .modal-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; font-size: 0.85rem; }
+        .modal-meta-item span { color: var(--text-muted); display: block; }
+        .modal-meta-item strong { color: var(--dark); }
+
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 4000; }
+        .toast { background: var(--dark); color: #fff; padding: 14px 20px; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); border-left: 4px solid var(--accent); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .catalog-layout { grid-template-columns: repeat(3, 1fr); }
+            .modal-grid { grid-template-columns: 1fr; }
+            .modal-cover-wrap { height: 180px; }
+        }
+        @media (max-width: 768px) {
+            .catalog-layout { grid-template-columns: repeat(2, 1fr); }
+            .catalog-controls { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .catalog-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-inner">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon">📚</div>
+                <span>Kitoob.</span>
+            </a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Bosh sahifa</a>
+                <a href="catalog.html" class="nav-link active">Kitoblar katalogi</a>
+                <a href="order.html" class="nav-link">Buyurtma va Navbat</a>
+            </nav>
+            <div class="header-actions">
+                <a href="order.html" class="icon-btn" title="Savat">
+                    🛒
+                    <span class="badge-count" id="cartCountBadge">0</span>
+                </a>
+                <a href="order.html" class="btn btn-primary">Buyurtma berish</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <h1>Barcha Kitoblar Katalogi</h1>
+            <p>Siz izlagan barcha bestseller, badiiy, ilmiy va psixologiya kitoblari to'plami.</p>
+        </div>
+    </section>
+
+    <!-- Main Catalog Container -->
+    <main class="container">
+        <!-- Controls: Search + Filter + Sort -->
+        <div class="catalog-controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Kitob nomi yoki muallifni qidiring...">
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">Barchasi</button>
+                <button class="filter-btn" data-category="badiiy">Badiiy</button>
+                <button class="filter-btn" data-category="biznes">Biznes</button>
+                <button class="filter-btn" data-category="psixologiya">Psixologiya</button>
+                <button class="filter-btn" data-category="it">IT & Kod</button>
+                <button class="filter-btn" data-category="bolalar">Bolalar</button>
+            </div>
+
+            <select class="sort-select" id="sortSelect">
+                <option value="popular">Ommabopligi bo'yicha</option>
+                <option value="price-asc">Narxi: Arzondan qimmatga</option>
+                <option value="price-desc">Narxi: Qimmatdan arzonga</option>
+                <option value="rating">Reytingi bo'yicha</option>
+            </select>
+        </div>
+
+        <!-- Catalog Grid -->
+        <div class="catalog-layout" id="booksGrid">
+            <!-- Rendered dynamically by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Book Details Modal -->
+    <div class="modal-overlay" id="bookModal">
+        <div class="modal-box">
+            <button class="modal-close" id="closeModalBtn">✕</button>
+            <div class="modal-grid">
+                <div class="modal-cover-wrap" id="modalCoverWrap">
+                    <!-- Dynamic cover art -->
+                </div>
+                <div class="modal-content">
+                    <h2 id="modalTitle">Kitob Nomi</h2>
+                    <div class="modal-author" id="modalAuthor">Muallif</div>
+                    <p class="modal-desc" id="modalDesc">Tavsif</p>
+                    
+                    <div class="modal-meta">
+                        <div class="modal-meta-item">
+                            <span>Janr:</span>
+                            <strong id="modalCat">Badiiy</strong>
+                        </div>
+                        <div class="modal-meta-item">
+                            <span>Sahifalar:</span>
+                            <strong id="modalPages">320 bet</strong>
+                        </div>
+                        <div class="modal-meta-item">
+                            <span>Muqova:</span>
+                            <strong id="modalCoverType">Qattiq muqova</strong>
+                        </div>
+                        <div class="modal-meta-item">
+                            <span>Reyting:</span>
+                            <strong id="modalRating" style="color: var(--accent);">★ 4.9</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center; margin-top: auto;">
+                        <span id="modalPrice" style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">49,000 so'm</span>
+                        <button class="btn btn-primary" id="modalAddCartBtn" style="flex-grow: 1;">
+                            Savatga qo'shish
+                        </button>
+                        <a href="order.html" class="btn" style="background: var(--accent); color:#000; font-weight:700;">
+                            Hozir olish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JAVASCRIPT FOR CATALOG -->
+    <script>
+        // Database of Books
+        const BOOKS_DATA = [
+            { id: 1, title: "Atom Odatlar", author: "Jeyms Klir", category: "psixologiya", price: 49000, rating: 4.9, pages: 340, coverBg: "linear-gradient(135deg, #4338ca, #312e81)", desc: "Kichik o'zgarishlar va amaliy tizimlar orqali odatlarni boshqarish va hayot sifatini tubdan oshirish haqidagi global bestseller." },
+            { id: 2, title: "Boy Ota, Kambag'al Ota", author: "Robert Kiyosaki", category: "biznes", price: 55000, rating: 4.8, pages: 280, coverBg: "linear-gradient(135deg, #059669, #064e3b)", desc: "Moliyaviy savodxonlik, investitsiya va pulning ishlash qoidalari haqida millionlab insonlarning dunyoqarashini o'zgartirgan kitob." },
+            { id: 3, title: "Ufq (Trilogiya)", author: "Said Ahmad", category: "badiiy", price: 75000, rating: 5.0, pages: 640, coverBg: "linear-gradient(135deg, #b91c1c, #7f1d1d)", desc: "O'zbek adabiyotining durdona asari. Ikkinchi jahon urushi yillari va xalqimizning jasorati, matonati aks etgan mashhur trilogiya." },
+            { id: 4, title: "Diqqat (Deep Work)", author: "Kel Nyuport", category: "psixologiya", price: 45000, rating: 4.7, pages: 304, coverBg: "linear-gradient(135deg, #d97706, #78350f)", desc: "Chalg'ituvchi texnologiyalar asrida chuqur diqqatni jamlash va yuqori samaradorlikka erishishning ilmiy sirlari." },
+            { id: 5, title: "Clean Code (Toza Kod)", author: "Robert Martin (Uncle Bob)", category: "it", price: 95000, rating: 4.9, pages: 464, coverBg: "linear-gradient(135deg, #0284c7, #0369a1)", desc: "Har bir professional dasturchi o'qishi shart bo'lgan arxitektura va toza, o'qilishi oson kod yozish qoidalari." },
+            { id: 6, title: "Kichkina Shahzoda", author: "Antuan de Sent-Ekzyuperi", category: "bolalar", price: 35000, rating: 4.9, pages: 120, coverBg: "linear-gradient(135deg, #7c3aed, #5b21b6)", desc: "Bolalar va kattalar uchun birdek sevimli bo'lgan, mehr-muhabbat va haqiqiy do'stlik haqidagi falsafiy ertak." },
+            { id: 7, title: "O'tkan Kunlar", author: "Abdulla Qodiriy", category: "badiiy", price: 50000, rating: 5.0, pages: 380, coverBg: "linear-gradient(135deg, #475569, #1e293b)", desc: "Birinchi o'zbek romani. Otabek va Kumushbibi muhabbati hamda tarixiy voqealar fojeasi." },
+            { id: 8, title: "Noldan Birga (Zero to One)", author: "Piter Til", category: "biznes", price: 60000, rating: 4.6, pages: 250, coverBg: "linear-gradient(135deg, #ea580c, #9a3412)", desc: "Startaplar, kelajakni qurish va yangi monopoliya yaratish bo'yicha Kremniy vodiysi sarmoyadori tajribasi." }
+        ];
+
+        // State
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let currentSort = 'popular';
+        let selectedBookForModal = null;
+
+        const CART_KEY = 'kitoob_cart';
+
+        function getCart() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+            } catch(e) { return []; }
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem(CART_KEY, JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            const cart = getCart();
+            const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            const badge = document.getElementById('cartCountBadge');
+            if (badge) badge.textContent = count;
+        }
+
+        function addToCart(id, title, price) {
+            const cart = getCart();
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1;
+            } else {
+                cart.push({ id, title, price, quantity: 1 });
+            }
+            saveCart(cart);
+            showToast(`"${title}" savatga qo'shildi! 🛒`);
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        function renderBooks() {
+            const grid = document.getElementById('booksGrid');
+            let filtered = BOOKS_DATA.filter(book => {
+                const matchCategory = currentFilter === 'all' || book.category === currentFilter;
+                const matchSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                    book.author.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchCategory && matchSearch;
+            });
+
+            // Sorting
+            if (currentSort === 'price-asc') filtered.sort((a,b) => a.price - b.price);
+            if (currentSort === 'price-desc') filtered.sort((a,b) => b.price - a.price);
+            if (currentSort === 'rating') filtered.sort((a,b) => b.rating - a.rating);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
+                        <h3>Hech qanday kitob topilmadi</h3>
+                        <p style="color:var(--text-muted); margin-top:8px;">Qidiruv so'zini o'zgartirib ko'ring yoki boshqa filtrni tanlang.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(book => `
+                <div class="catalog-card" onclick="openBookModal(${book.id})">
+                    <div class="card-cover">
+                        <span class="cat-badge">${book.category.toUpperCase()}</span>
+                        <div class="mockup-book" style="background: ${book.coverBg};">
+                            <div>
+                                <small style="opacity:0.8;">${book.category}</small>
+                                <h5 style="font-size:0.95rem; margin-top:4px;">${book.title}</h5>
+                            </div>
+                            <small style="opacity:0.85;">${book.author}</small>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h4 class="card-title">${book.title}</h4>
+                        <div class="card-author">${book.author}</div>
+                        <div style="font-size:0.85rem; color:var(--accent); font-weight:700; margin-bottom:12px;">★ ${book.rating}</div>
+                        <div class="card-price-row">
+                            <span class="price-text">${book.price.toLocaleString()} so'm</span>
+                            <div class="card-actions" onclick="event.stopPropagation();">
+                                <button class="btn-circle" onclick="addToCart(${book.id}, '${book.title.replace(/'/g, "\\'")}', ${book.price})" title="Savatga qo'shish">
+                                    🛒
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal Functionality
+        function openBookModal(id) {
+            const book = BOOKS_DATA.find(b => b.id === id);
+            if (!book) return;
+            selectedBookForModal = book;
+
+            document.getElementById('modalTitle').textContent = book.title;
+            document.getElementById('modalAuthor').textContent = "Muallif: " + book.author;
+            document.getElementById('modalDesc').textContent = book.desc;
+            document.getElementById('modalCat').textContent = book.category.toUpperCase();
+            document.getElementById('modalPages').textContent = book.pages + " bet";
+            document.getElementById('modalRating').textContent = "★ " + book.rating;
+            document.getElementById('modalPrice').textContent = book.price.toLocaleString() + " so'm";
+            
+            document.getElementById('modalCoverWrap').innerHTML = `
+                <div class="mockup-book" style="background: ${book.coverBg}; width: 140px; height: 200px;">
+                    <div>
+                        <small style="opacity:0.8;">${book.category}</small>
+                        <h4 style="font-size:1.1rem; margin-top:6px;">${book.title}</h4>
+                    </div>
+                    <small style="opacity:0.85;">${book.author}</small>
+                </div>
+            `;
+
+            document.getElementById('modalAddCartBtn').onclick = () => {
+                addToCart(book.id, book.title, book.price);
+            };
+
+            document.getElementById('bookModal').classList.add('active');
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartBadge();
+
+            // Check URL param for category e.g. catalog.html?cat=biznes
+            const params = new URLSearchParams(window.location.search);
+            const catParam = params.get('cat');
+            if (catParam) {
+                currentFilter = catParam;
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.category === catParam);
+                });
+            }
+
+            renderBooks();
+
+            // Filter button clicks
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.category;
+                    renderBooks();
+                });
+            });
+
+            // Search Input Live
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                renderBooks();
+            });
+
+            // Sort Select
+            document.getElementById('sortSelect').addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                renderBooks();
+            });
+
+            // Close Modal
+            document.getElementById('closeModalBtn').addEventListener('click', () => {
+                document.getElementById('bookModal').classList.remove('active');
+            });
+            document.getElementById('bookModal').addEventListener('click', (e) => {
+                if (e.target.id === 'bookModal') {
+                    document.getElementById('bookModal').classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
